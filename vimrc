@@ -11,11 +11,11 @@ nmap <space> <leader>
 nnoremap <Leader>w :w<CR>
 nnoremap <Leader>q :x<CR>
 
-" Ctags
-nnoremap <leader>. :CtrlPTag<cr>
-
 " Show docs
-noremap <leader>m :call <SID>show_documentation()<CR>
+noremap <leader>d :call <SID>show_documentation()<CR>
+
+" Toggle NERDTree
+noremap <leader>t :NERDTreeToggle<CR>
 
 "------------------------------------------------------------
 " General
@@ -52,7 +52,6 @@ hi Search ctermfg=White
 " Cursor Line
 set cursorline
 hi CursorLine gui=underline cterm=underline
-nnoremap <Leader>c :set cursorline!
 
 " Splits
 nnoremap <C-J> <C-W>j
@@ -140,4 +139,12 @@ function! s:show_documentation()
   endif
 endfunction
 
+"-------------------------------------------------------------
+" Install VimPlug
+
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 

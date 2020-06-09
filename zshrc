@@ -1,6 +1,6 @@
 
 ### Added by Zplugin's installer
-source '/Users/kev/.zplugin/bin/zplugin.zsh'
+source '/Users/kevinchen/.zplugin/bin/zplugin.zsh'
 autoload -Uz _zplugin
 (( ${+_comps} )) && _comps[zplugin]=_zplugin
 ### End of Zplugin installer's chunk
@@ -27,3 +27,10 @@ ZSH_AUTOSUGGEST_USE_ASYNC=1
 
 # Path
 export PATH=$PATH:~/.emacs.d/bin
+### End of Zinit's installer chunk
+### End of Zinit's installer chunk
+### End of Zinit's installer chunk
+### End of Zinit's installer chunk
+
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
