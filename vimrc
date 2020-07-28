@@ -66,6 +66,50 @@ highlight BadWhitespace ctermbg=red guibg=red
 au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
 
 "------------------------------------------------------------
+" Plugins
+call plug#begin('~/.vim/plugged')
+Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'universal-ctags/ctags' | Plug 'craigemery/vim-autotag'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'preservim/nerdtree'
+Plug 'christoomey/vim-tmux-navigator'
+
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+call plug#end()
+
+" Ctags
+set tags=tags;
+
+" Intellisense faster linting
+set updatetime=300
+
+" Open nerdtree on startup
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" Tmux navigator
+let g:tmux_navigator_save_on_switch = 2
+
+"------------------------------------------------------------
+" Golang (vim-go)
+
+" Run goimports along gofmt on each save     
+let g:go_fmt_command = "goimports"
+
+" Automatically get signature/type info for object under cursor
+let g:go_auto_type_info = 1
+
+" Making vim-go use gopls language server (don't need this. using coc.nvim for
+" autocomplete for everything. gopls for specific go compilation/debugging
+" let g:go_def_mode='gopls'
+" let g:go_info_mode='gopls'
+
+" disable vim-go :GoDef short cut (gd)
+" this is handled by coc.nvim LanguageClient [LC]
+let g:go_def_mapping_enabled = 0
+
+"------------------------------------------------------------
 " Python
 " Highlighting
 let python_highlight_all=1
@@ -90,31 +134,7 @@ au BufNewFile,BufRead *.cc
     \ set autoindent
 
 "------------------------------------------------------------
-" Plugins
-call plug#begin('~/.vim/plugged')
-Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
-Plug 'ctrlpvim/ctrlp.vim'
-Plug 'universal-ctags/ctags' | Plug 'craigemery/vim-autotag'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'preservim/nerdtree'
-Plug 'christoomey/vim-tmux-navigator'
-call plug#end()
-
-" Ctags
-set tags=tags;
-
-" Intellisense faster linting
-set updatetime=300
-
-" Open nerdtree on startup
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-
-" Tmux navigator
-let g:tmux_navigator_save_on_switch = 2
-
-"------------------------------------------------------------
-" Vim Functions
+" coc.nvim for language servers
 
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
@@ -129,6 +149,12 @@ function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
 
 " Show docs
 function! s:show_documentation()

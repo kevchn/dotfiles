@@ -9,6 +9,7 @@
     ~/.tmux.conf: tmux.conf
     ~/.vimrc: vimrc
     ~/.zshrc: zshrc
+    Library/Application\ Support/Code/User/settings.js: settings.js
 
 - create:
     - ~/downloads
