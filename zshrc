@@ -1,3 +1,28 @@
+# Neeva Setup AWS ########################
+export NAMESPACE=kevin
+
+# Alias ##################################
+function kc () {
+  kubectl --namespace ${NAMESPACE} $*
+}
+
+function awsprod () {
+  pushd ~/Code/neeva;
+  eval $(go run neeva.co/cmd/prodaccess aws shell --eval);
+  eval $(./setup_dev.sh setup);
+  popd
+}
+
+function awsssh () {
+  echo "Setting up SSH key and AWS shell"
+  ssh-add ~/.ssh/kevin-ec2-east1.pem;
+  eval $(go run neeva.co/cmd/prodaccess aws shell --eval)
+}
+
+alias "awsutil"="USER=kevin awsutil"
+
+alias ctags="`brew --prefix`/bin/ctags"
+
 # Scripts #################################
 # Autojump (cd that remembers)
 [ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
@@ -40,3 +65,26 @@ zinit light zdharma/fast-syntax-highlighting
 zinit ice wait atload'_zsh_autosuggest_start' lucid
 zinit light zsh-users/zsh-autosuggestions
 ZSH_AUTOSUGGEST_USE_ASYNC=1
+
+# NVM
+NVM_DIR="$HOME/.nvm"
+if [ -d $NVM_DIR/versions/node ]; then
+  NODE_GLOBALS=(`find $NVM_DIR/versions/node -maxdepth 3 \( -type l -o -type f \) -wholename '*/bin/*' | xargs -n1 basename | sort | uniq`)
+fi
+NODE_GLOBALS+=("nvm")
+load_nvm () {
+  for cmd in "${NODE_GLOBALS[@]}"; do unset -f ${cmd} &>/dev/null; done
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+  nvm use 2> /dev/null 1>&2 || true
+  export NVM_LOADED=1
+}
+for cmd in "${NODE_GLOBALS[@]}"; do
+  if ! which ${cmd} &>/dev/null; then
+    eval "${cmd}() { unset -f ${cmd} &>/dev/null; [ -z \${NVM_LOADED+x} ] && load_nvm; ${cmd} \$@; }"
+  fi
+done
+
+# Pyenv
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi

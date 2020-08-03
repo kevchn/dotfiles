@@ -4,12 +4,13 @@
 
 - clean: ['~']
 
+# symbolic link <- source file (in current directory)
 - link:
     ~/.dotfiles: ''  
     ~/.tmux.conf: tmux.conf
     ~/.vimrc: vimrc
     ~/.zshrc: zshrc
-    Library/Application\ Support/Code/User/settings.js: settings.js
+    ~/.ssh/rc: ssh_rc
 
 - create:
     - ~/downloads
