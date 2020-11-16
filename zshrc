@@ -1,22 +1,49 @@
-# Neeva Setup AWS ########################
+# Neeva Env Vars #########################
+export NEEVA_USER=kevin
 export NAMESPACE=kevin
+export KUBECONFIG=~/Code/neeva/production/instances/dev-us-west-2/eks/kubeconfig
+
+export NEEVA_KAFKA_TLS_CERT_FILE="$(dirname $(dirname "${KUBECONFIG}"))/kubernetes/pubsub/tls.crt"
+export NEEVA_KAFKA_TOPIC_PREFIX="$NAMESPACE-"
+export NEEVA_KAFKA_BROKERS="localhost:29090,localhost:29091,localhost:29092"
+export NEEVA_SCHEMA_REGISTRY="localhost:8082"
+
+export NEEVA_MYSQL_HOST="localhost"
 
 # Alias ##################################
+alias grafana="kubectl -n monitoring port-forward service/grafana 3000"
+
+function listening() {
+  if [[ $# -eq 0 ]]; then
+      sudo lsof -iTCP -sTCP:LISTEN -n -P
+  elif [[ $# -eq 1 ]]; then
+      sudo lsof -iTCP -sTCP:LISTEN -n -P | grep -i --color $1
+  else
+      echo "Usage: listening [pattern]"
+  fi
+}
+
 function kc () {
   kubectl --namespace ${NAMESPACE} $*
 }
 
-function awsprod () {
-  pushd ~/Code/neeva;
-  eval $(go run neeva.co/cmd/prodaccess aws shell --eval);
-  eval $(./setup_dev.sh setup);
-  popd
+# Authenticates
+function a () {
+  eval $(go run neeva.co/cmd/prodaccess aws shell --eval --verbose)
 }
 
-function awsssh () {
-  echo "Setting up SSH key and AWS shell"
-  ssh-add ~/.ssh/kevin-ec2-east1.pem;
-  eval $(go run neeva.co/cmd/prodaccess aws shell --eval)
+# Set up env variables
+function setupdev () {
+  eval $(./setup_dev.sh --namespace $NAMESPACE setup)
+}
+
+function clusternotebook () {
+  setup_dev.sh --namespace=${NAMESPACE} spark notebook
+}
+
+# Update stack with new pods, run every week
+function newpods () {
+  eval $(./setup_dev.sh --namespace $NAMESPACE setup); kubectl -n $NAMESPACE delete -f production/kubernetes/redis; ./setup_dev.sh --namespace $NAMESPACE kube;
 }
 
 alias "awsutil"="USER=kevin awsutil"
@@ -88,3 +115,5 @@ done
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

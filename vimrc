@@ -5,6 +5,10 @@
 set wildmode=longest,list,full
 set wildmenu
 
+" NERDTree starts up when no files are specified
+" autocmd StdinReadPre * let s:std_in=1
+" autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
 "------------------------------------------------------------
 " Leader Mappings
 nmap <space> <leader>
@@ -17,10 +21,17 @@ noremap <leader>d :call <SID>show_documentation()<CR>
 " Toggle NERDTree
 noremap <leader>t :NERDTreeToggle<CR>
 
+" Toggle Gitblame
+noremap <leader>b :Gblame<CR>
+
+nnoremap <C-p> :GFiles<CR>
+nnoremap <C-m> :GFiles?<CR>
+
 "------------------------------------------------------------
 " General
 set t_Co=256
 syntax on
+filetype plugin indent on
 set number
 set linebreak
 set showbreak=+++
@@ -69,27 +80,44 @@ au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
 " Plugins
 call plug#begin('~/.vim/plugged')
 Plug 'vim-airline/vim-airline' | Plug 'vim-airline/vim-airline-themes'
-Plug 'ctrlpvim/ctrlp.vim'
 Plug 'universal-ctags/ctags' | Plug 'craigemery/vim-autotag'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'preservim/nerdtree'
 Plug 'christoomey/vim-tmux-navigator'
-
+Plug 'dag/vim-fish'
+Plug 'tpope/vim-fugitive'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'chriskempson/base16-vim'
+Plug 'psf/black', { 'branch': 'stable' }
+Plug 'fisadev/vim-isort'
+Plug 'airblade/vim-gitgutter'
 call plug#end()
+
+" Color theme
+let base16colorspace=256
+colorscheme base16-tomorrow-night
 
 " Ctags
 set tags=tags;
 
 " Intellisense faster linting
-set updatetime=300
-
-" Open nerdtree on startup
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+set updatetime=100
 
 " Tmux navigator
 let g:tmux_navigator_save_on_switch = 2
+
+" Fugitive status line (git)
+set statusline+=%{FugitiveStatusline()}
+
+" Fish
+autocmd FileType fish compiler fish
+autocmd FileType fish setlocal textwidth=79
+
+if &shell =~# 'fish$'
+  set shell=sh
+endif
 
 "------------------------------------------------------------
 " Golang (vim-go)
@@ -111,6 +139,11 @@ let g:go_def_mapping_enabled = 0
 
 "------------------------------------------------------------
 " Python
+
+" Black fmt on save
+autocmd BufWritePre *.py execute ':Black'
+autocmd BufWritePre *.py execute ':Isort'
+
 " Highlighting
 let python_highlight_all=1
 
